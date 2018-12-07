@@ -12,11 +12,11 @@ class SingleDataset(BaseDataset):
     def initialize(self, opt):
         self.opt = opt
         self.root = opt.dataroot
-        self.dir_A = os.path.join(opt.dataroot)
+        self.dir_A = os.path.join(opt.dataroot, opt.phase + 'A') # depend on the dataroot name make dataset /MR2CT/testA
 
         self.A_paths = make_dataset(self.dir_A)
 
-        self.A_paths = sorted(self.A_paths)
+        self.A_paths = sorted(self.A_paths, key=lambda x: int(x.split('_')[-1].split('.')[-2]))  # sort as increasing of i : 1,2,3...
 
         self.transform = get_transform(opt)
 

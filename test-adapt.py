@@ -27,7 +27,7 @@ if __name__ == '__main__':
     webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.which_epoch))
 
     # test
-    Data_root_3d = '/data0/geyunhao/MR2CT_SAMPLING/'
+    Data_root_3d = './dataset/'
     # nct_3d_samp = md.read_image(Data_root_3d + 'ZS10307488/nfct.nii.gz')
     # nct_3d_samp = md.read_image(Data_root_3d + 'ZS18111863/t1_wfi_wb_IP_Tra_9.nii') #384 * 549
     nct_3d_samp = md.read_image(Data_root_3d + 'ZS18158187/T1_WFI_WB_IP_Tra_8.nii')  # 384 * 549
