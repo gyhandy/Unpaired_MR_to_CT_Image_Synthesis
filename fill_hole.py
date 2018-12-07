@@ -33,7 +33,7 @@ out_root_3d = '/data0/geyunhao/filehole/'
 for roots, dirs, files in os.walk(Source_root_3d):
     for file in files:
         file_path = os.path.join(roots, file)
-        if 'Untitled' in file:  # MR
+        if 'Untitled.nii.gz' in file:  # MR
 
             output = Fillhole(file_path)
             target_filename = roots.split('/')[-1] + '_ct.nii.gz'

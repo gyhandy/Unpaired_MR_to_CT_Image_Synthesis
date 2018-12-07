@@ -13,7 +13,10 @@ class TestModel(BaseModel):
         parser = CycleGANModel.modify_commandline_options(parser, is_train=False)
         parser.set_defaults(dataset_mode='single')
 
-        parser.add_argument('--model_suffix', type=str, default='',
+        # parser.add_argument('--model_suffix', type=str, default='',
+        #                     help='In checkpoints_dir, [which_epoch]_net_G[model_suffix].pth will'
+        #                     ' be loaded as the generator of TestModel')
+        parser.add_argument('--model_suffix', type=str, default='_A',
                             help='In checkpoints_dir, [which_epoch]_net_G[model_suffix].pth will'
                             ' be loaded as the generator of TestModel')
 

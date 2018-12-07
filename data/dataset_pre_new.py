@@ -5,22 +5,32 @@ from PIL import Image
 import matplotlib
 import scipy.misc
 
-Data_root_3d = '/data0/geyunhao/MR2CT/'
+
+# Data_root_3d = '/data0/geyunhao/MR2CT/ZS10307488/'
+# Data_root_3d = '/data0/geyunhao/MR2CT_SAMPLING/ZS18111863/'
+# Data_root_3d = '/data0/geyunhao/explicit_rigid/ZS10307488/'
+# Data_root_3d = '/data0/geyunhao/explicit_rigid/'
+Data_root_3d = '/data0/geyunhao/explicit_new/'
+
 # Data_sam_root = '/data0/geyunhao/MR2CT_SAMPLING/'
-Data_root_2d = '/home/geyunhao/Mapping/Mapping/CycleGAN-original/datasets/MR2CT/'
+# Data_root_3d = '/data0/geyunhao/MR2CT/'
+Data_root_2d = '/home/geyunhao/Mapping/Mapping/self_supervise/datasets/explicit_rigid_new/'
 DATA_NAME = 'train' # train, test, val, ex
 IMAGE_TYPE = '.png'
 '''
-    Turn the 3D slice to 2D slice and satisfy the structure of cycleGAnN
+    Turn the 3D slice to 2D slice and satisfy the structure of cycleGAN
 '''
 # save to .png
 
 target_path_mr = Data_root_2d + DATA_NAME + 'A'
 target_path_nct = Data_root_2d + DATA_NAME + 'B'
+target_path_mr_mask = Data_root_2d + 'mask' + 'A'
 if not os.path.exists(target_path_mr):
     os.makedirs(target_path_mr)
 if not os.path.exists(target_path_nct):
     os.makedirs(target_path_nct)
+if not os.path.exists(target_path_mr_mask):
+    os.makedirs(target_path_mr_mask)
 
 
 for roots, dirs, files in os.walk(Data_root_3d):
@@ -35,11 +45,11 @@ for roots, dirs, files in os.walk(Data_root_3d):
                 get part of data
                 '''
                 # the approximately leg part in mri is range (0-60)
-                # the approximately pelvicum part in mri is range (70-170)
+                # the approximately pelvicum part in mri is range (70-230)
                 # the approximately lib part in mri is range (200-360)
-                # if i >= 200 and i <= 360:
+                # if i >= 70 and i <= 230:
                 '''
-                get all data
+                whole body
                 '''
                 slice0 = np.expand_dims(mr_3d_np[i, :, :], 0)  # get slice data without decay (1,y,x)
                 '''
@@ -58,6 +68,7 @@ for roots, dirs, files in os.walk(Data_root_3d):
 
                 #  cut off the image
                 slice0[slice0 > mrIP_intensity_max] = mrIP_intensity_max
+                slice0[slice0 < mrIP_intensity_min] = mrIP_intensity_min
                 slice0 = (slice0 - mrIP_intensity_min) / (mrIP_intensity_max - mrIP_intensity_min) * 255
 
                 # nct_ref.from_numpy(slice0)  # put slice data into ref
@@ -71,7 +82,6 @@ for roots, dirs, files in os.walk(Data_root_3d):
 
 
 
-
         elif 'nfct' in file:
         # if 'nfCT' in file:
             nct_3d = md.read_image(file_path)  # (x,y,z)
@@ -80,22 +90,23 @@ for roots, dirs, files in os.walk(Data_root_3d):
                 '''
                 get part of data
                 '''
-                # the approximately leg part in mri is range (0-60)
-                # the approximately pelvicum part in mri is range (70-170)
-                # the approximately lib part in mri is range (200-360)
-                # if i >= 200 and i <= 360:
+                # the approximately leg part in nfct is range (0-60)
+                # the approximately pelvicum part in nfct is range (40-200)
+                # the approximately lib part in nfct is range (200-360)
+                # if i >= 40 and i <= 200:
                 '''
-                get all data
+                whole body
                 '''
                 slice0 = np.expand_dims(nct_3d_np[i, :, :], 0)  # get slice data without decay (1,y,x)
                 if slice0.max() > 0:  # some of the image are totally black
                     '''
-                    normalize 0-255
+                      normalize 0-255
                     '''
                     nctIP_intensity_min = np.float32(-1000.0)
                     nctIP_intensity_max = np.float32(1400.0)
                     #  cut off the image
                     slice0[slice0 > nctIP_intensity_max] = nctIP_intensity_max
+                    slice0[slice0 < nctIP_intensity_min] = nctIP_intensity_min
                     slice0 = (slice0 - nctIP_intensity_min) / (nctIP_intensity_max - nctIP_intensity_min) * 255
                     # nct_ref.from_numpy(slice0)  # put slice data into ref
                     target_path = target_path_nct
@@ -103,6 +114,55 @@ for roots, dirs, files in os.walk(Data_root_3d):
                     if not os.path.exists(target_path + '/' + target_filename):
                         scipy.misc.imsave(target_path + '/' + target_filename, slice0[0])
                     # md.write_image(nct_ref, target_path + '/' + target_filename)  #
+
+        # get mask of mr
+        elif 'mr_mask' in file:
+            mr_mask_3d = md.read_image(file_path)  # (x,y,z)
+            mr_mask_3d_np = mr_mask_3d.to_numpy() # (z,y,x)
+            for i in range(mr_mask_3d_np.shape[0]): # z
+
+                '''
+                get part of data
+                '''
+                # the approximately leg part in mri is range (0-60)
+                # the approximately pelvicum part in mri is range (70-230)
+                # the approximately lib part in mri is range (200-360)
+                # if i >= 70 and i <= 230:
+                '''
+                whole body
+                '''
+                slice0 = np.expand_dims(mr_mask_3d_np[i, :, :], 0)  # get slice data without decay (1,y,x)
+
+                '''
+                resize the mr
+                '''
+                # resize[1, 384, 549] to [1, 384, 548] for net_G
+                slice0 = slice0[:, :, :-1]
+                # resize[1, 384, 548] to [1, 512, 512]
+                slice0 = slice0[:, :, 18:530]
+                slice0 = np.pad(slice0, ((0, 0), (64, 64), (0, 0)), 'constant', constant_values=0)
+
+                # scipy.misc.imsave(target_path_mr_mask + '/' + target_filename, slice0[0])
+                # '''
+                # normalize 0-255
+                # '''
+                # mrIP_intensity_min = np.float32(0.0)
+                # mrIP_intensity_max = np.float32(400.0)
+                #
+                # #  cut off the image
+                # slice0[slice0 > mrIP_intensity_max] = mrIP_intensity_max
+                # slice0[slice0 < mrIP_intensity_min] = mrIP_intensity_min
+                # slice0 = (slice0 - mrIP_intensity_min) / (mrIP_intensity_max - mrIP_intensity_min) * 255
+                #
+                # # nct_ref.from_numpy(slice0)  # put slice data into ref
+                #
+                # # im = Image.fromarray(slice0)
+                target_path = target_path_mr_mask
+                target_filename = 'mrmask_' + roots.split('/')[-1] + '_'+ str(i) + IMAGE_TYPE
+                if not os.path.exists(target_path + '/' + target_filename):
+                    scipy.misc.imsave(target_path + '/' + target_filename, slice0[0])
+                    # im.save(target_path + '/' + target_filename)
+
 
 
 

@@ -34,6 +34,8 @@ if __name__ == '__main__':
             if total_steps % opt.display_freq == 0:
                 save_result = total_steps % opt.update_html_freq == 0
                 visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
+                print(data['A_paths'][0])
+                print(data['B_paths'][0])
 
             if total_steps % opt.print_freq == 0:
                 losses = model.get_current_losses()

@@ -12,8 +12,10 @@ class BaseOptions():
 
     def initialize(self, parser):
         # parser.add_argument('--dataroot', required=True, help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
-        parser.add_argument('--dataroot', type=str, default='./datasets/MR2CT_reg', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
-        parser.add_argument('--batchSize', type=int, default=8, help='input batch size')
+        parser.add_argument('--dataroot', type=str, default='./datasets/explicit_rigid', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
+        # parser.add_argument('--dataroot', type=str, default='./datasets/MR2CT_pure',
+        #                     help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
+        parser.add_argument('--batchSize', type=int, default=1, help='input batch size')
         parser.add_argument('--loadSize', type=int, default=286, help='scale images to this size')
         parser.add_argument('--fineSize', type=int, default=256, help='then crop to this size')
 
@@ -24,10 +26,12 @@ class BaseOptions():
         parser.add_argument('--which_model_netD', type=str, default='basic', help='selects model to use for netD')
         parser.add_argument('--which_model_netG', type=str, default='resnet_9blocks', help='selects model to use for netG')
         parser.add_argument('--n_layers_D', type=int, default=3, help='only used if which_model_netD==n_layers')
-        parser.add_argument('--gpu_ids', type=str, default='1, 2', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+        parser.add_argument('--gpu_ids', type=str, default='2', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 
 
-        parser.add_argument('--name', type=str, default='reg_CycleGAN_Lcc', help='name of the experiment. It decides where to store samples and models')
+        # parser.add_argument('--name', type=str, default='pure_CycleGAN_Lcc', help='name of the experiment. It decides where to store samples and models')
+        parser.add_argument('--name', type=str, default='Self+Lcc_finetune',
+                            help='name of the experiment. It decides where to store samples and models')
         parser.add_argument('--dataset_mode', type=str, default='unaligned', help='chooses how datasets are loaded. [unaligned | aligned | single]')
         parser.add_argument('--model', type=str, default='cycle_gan',
                             help='chooses which model to use. cycle_gan, pix2pix, test')

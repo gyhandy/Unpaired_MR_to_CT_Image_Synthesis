@@ -23,10 +23,17 @@ class BaseDataset(data.Dataset):
 
 def get_transform(opt):
     transform_list = []
+    # if opt.resize_or_crop == 'resize_and_crop':
+    #     osize = [opt.loadSize, opt.loadSize]
+    #     transform_list.append(transforms.Resize(osize, Image.BICUBIC))
+    #     transform_list.append(transforms.RandomCrop(opt.fineSize))
+    '''
+    avoid the mismatch
+    '''
     if opt.resize_or_crop == 'resize_and_crop':
-        osize = [opt.loadSize, opt.loadSize]
+        osize = [opt.fineSize, opt.fineSize]
         transform_list.append(transforms.Resize(osize, Image.BICUBIC))
-        transform_list.append(transforms.RandomCrop(opt.fineSize))
+        # transform_list.append(transforms.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'crop':
         transform_list.append(transforms.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'scale_width':
@@ -42,8 +49,8 @@ def get_transform(opt):
     else:
         raise ValueError('--resize_or_crop %s is not a valid option.' % opt.resize_or_crop)
 
-    if opt.isTrain and not opt.no_flip:
-        transform_list.append(transforms.RandomHorizontalFlip())
+    # if opt.isTrain and not opt.no_flip:
+    #     transform_list.append(transforms.RandomHorizontalFlip())
 
     transform_list += [transforms.ToTensor(),
                        transforms.Normalize((0.5, 0.5, 0.5),

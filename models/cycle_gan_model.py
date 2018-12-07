@@ -3,7 +3,15 @@ import itertools
 from util.image_pool import ImagePool
 from .base_model import BaseModel
 from . import networks
+from unet import UNet
+import numpy as np
 
+from scipy import misc
+from skimage import io,transform
+from PIL import Image
+
+import matplotlib.pyplot as plt
+import torch.nn.functional as F
 
 class CycleGANModel(BaseModel):
     def name(self):
@@ -27,6 +35,11 @@ class CycleGANModel(BaseModel):
             parser.add_argument('--lambda_co_A', type=float, default=2, help='weight for correlation coefficient loss (A -> B)')
             parser.add_argument('--lambda_co_B', type=float, default=2,
                                 help='weight for correlation coefficient loss (B -> A )')
+            '''
+            adjust the weight of Self loss
+            '''
+            parser.add_argument('--lambda_Self', type=float, default=10.0,
+                                help='weight for Self loss (A -> B)')
         return parser
 
     def initialize(self, opt):
@@ -34,10 +47,12 @@ class CycleGANModel(BaseModel):
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
         # self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'D_B', 'G_B', 'cycle_B', 'idt_B']
-        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'cor_coe_GA', 'D_B', 'G_B', 'cycle_B', 'cor_coe_GB']
+        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'cor_coe_GA', 'Self', 'D_B', 'G_B', 'cycle_B', 'cor_coe_GB']
         # specify the images you want to save/display. The program will call base_model.get_current_visuals
-        visual_names_A = ['real_A', 'fake_B', 'rec_A']
-        visual_names_B = ['real_B', 'fake_A', 'rec_B']
+        # visual_names_A = ['real_A', 'fake_B', 'rec_A']
+        # visual_names_B = ['real_B', 'fake_A', 'rec_B']
+        visual_names_A = ['real_A', 'fake_B', 'rec_A', 'mask_A']
+        visual_names_B = ['real_B', 'fake_A', 'rec_B', 'mask_B']
         if self.isTrain and self.opt.lambda_identity > 0.0:
             visual_names_A.append('idt_A')
             visual_names_B.append('idt_B')
@@ -46,6 +61,7 @@ class CycleGANModel(BaseModel):
         # specify the models you want to save to the disk. The program will call base_model.save_networks and base_model.load_networks
         if self.isTrain:
             self.model_names = ['G_A', 'G_B', 'D_A', 'D_B']
+            # self.model_names = ['G_A', 'G_B', 'D_A', 'D_B', 'E_A', 'E_B'] # E_A for MR, E_B for CT
         else:  # during test time, only load Gs
             self.model_names = ['G_A', 'G_B']
 
@@ -56,6 +72,17 @@ class CycleGANModel(BaseModel):
                                         opt.ngf, opt.which_model_netG, opt.norm, not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.netG_B = networks.define_G(opt.output_nc, opt.input_nc,
                                         opt.ngf, opt.which_model_netG, opt.norm, not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+
+        '''
+        E_A E_B
+        '''
+        # self.netE_A = UNet(n_channels=3, n_classes=1)
+        # self.netE_A.load_state_dict(torch.load('/home/geyunhao/Mapping/Mapping/self_supervise/CT_segmentation/checkpoints/CP5.pth'))
+        # self.netE_A.cuda()
+        self.netE_B = UNet(n_channels=3, n_classes=1)
+        self.netE_B.load_state_dict(torch.load('/home/geyunhao/Mapping/Mapping/self_supervise/CT_segmentation/checkpoints/CP5.pth'))
+        # self.netE_B.load_state_dict(torch.load('/home/geyunhao/Mapping/Mapping/self_supervise/CT_segmentation/checkpoints/CTCP5.pth'))
+        self.netE_B.cuda()
 
         if self.isTrain:
             use_sigmoid = opt.no_lsgan
@@ -85,6 +112,7 @@ class CycleGANModel(BaseModel):
         self.real_A = input['A' if AtoB else 'B'].to(self.device)
         self.real_B = input['B' if AtoB else 'A'].to(self.device)
         self.image_paths = input['A_paths' if AtoB else 'B_paths']
+        self.maskA_path = input['A_paths'][0].replace('trainA','maskA').replace('mr','mrmask')
 
     def forward(self):
         self.fake_B = self.netG_A(self.real_A)
@@ -92,6 +120,36 @@ class CycleGANModel(BaseModel):
 
         self.fake_A = self.netG_B(self.real_B)
         self.rec_B = self.netG_A(self.fake_A)
+
+        '''
+        add the mask
+        '''
+        self.fake_B_adj = (self.fake_B - (-1)) / (1 - (-1)) * 255.0
+        # self.fake_B_adj = self.fake_B_adj.squeeze(0)
+
+        # misc.imsave("fake_B.png", np.array(self.fake_B.cpu().detach().numpy()[0][0]))
+        # misc.imsave("real_A.png", np.array(self.real_A.cpu().detach().numpy()[0][0]))
+        # im = misc.imread("6_99CT.jpg")
+        # im = Image.open("6_99CT.jpg")
+        # im1 = misc.imread("fake_B.png")
+
+        self.mask_B_mid = self.netE_B(torch.cat((self.fake_B_adj, self.fake_B_adj, self.fake_B_adj), 1))
+        self.mask_B = F.sigmoid(self.mask_B_mid) # 0-1
+        # if np.any(np.isnan(self.mask_B.cpu().detach().numpy())) == True:
+        #     print('the raw data contain nan')
+        #     print(self.data['A_paths'][0])
+        # misc.imsave("mask_B.gif", np.array(self.mask_B.cpu().detach().numpy()[0][0]))
+        # misc.imsave("mask_B_last.gif", np.array(self.mask_B_last.cpu().detach().numpy()[0][0]))
+        # self.mask_B = self.mask_B.unsqueeze(0)
+        self.mask_A_mid = io.imread(self.maskA_path)
+        # if np.any(np.isnan(self.mask_A_mid)) == True:
+        #     print('the raw data contain nan')
+        #     print(self.data['A_paths'][0])
+        self.mask_A = torch.from_numpy(transform.resize(self.mask_A_mid, (256, 256))).float().cuda().unsqueeze(0).unsqueeze(0)
+        # misc.imsave("mask_A.gif", self.mask_A)
+        # self.mask_A = misc.imread(self.maskA_path)
+
+        # self.mask_A = self.netE_A(torch.cat((self.real_A, self.real_A, self.real_A), 1))
 
     def backward_D_basic(self, netD, real, fake):
         # Real
@@ -123,6 +181,10 @@ class CycleGANModel(BaseModel):
         '''
         lambda_co_A = self.opt.lambda_co_A
         lambda_co_B = self.opt.lambda_co_B
+        '''
+        lambda_Self
+        '''
+        lambda_Self = self.opt.lambda_Self
         # Identity loss
         if lambda_idt > 0:
             # G_A should be identity if real_B is fed.
@@ -148,17 +210,28 @@ class CycleGANModel(BaseModel):
         '''
         self.loss_cor_coe_GA = networks.Cor_CoeLoss(self.fake_B, self.real_A) * lambda_co_A# fake ct & real mr; Evaluate the Generator of ct(G_A)
         self.loss_cor_coe_GB = networks.Cor_CoeLoss(self.fake_A, self.real_B) * lambda_co_B # fake mr & real ct; Evaluate the Generator of mr(G_B)
+        '''
+        self.loss_Self
+        '''
+        # self.Self_loss_func = torch.nn.L1Loss()
+        # self.Self_loss = self.criterionCycle(self.mask_B, self.mask_A.detach())
+        self.loss_Self = self.criterionCycle(self.mask_B, self.mask_A) * lambda_Self
+        # self.L22 = torch.nn.MSELoss()
+        # self.loss_Self = self.L22(self.mask_B, self.mask_A) * lambda_Self
+
+
 
         # combined loss
         # self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_cor_coe_GA + self.loss_cor_coe_GB
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_cor_coe_GA + self.loss_cor_coe_GB + self.loss_Self
         self.loss_G.backward()
 
     def optimize_parameters(self):
         # forward
         self.forward()
         # G_A and G_B
-        self.set_requires_grad([self.netD_A, self.netD_B], False)
+        # self.set_requires_grad([self.netD_A, self.netD_B], False)
+        self.set_requires_grad([self.netD_A, self.netD_B, self.netE_B], False)
         self.optimizer_G.zero_grad()
         self.backward_G()
         self.optimizer_G.step()
