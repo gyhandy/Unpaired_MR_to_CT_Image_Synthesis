@@ -17,7 +17,7 @@ Contribution
 to improve the synthesis quality. Gained substantial quality improvement especially in the surface shape and bone in whole body image
 mapping  
 
-<img src="img src='idea/show1.png'" width="800px"/>
+<img src="img src='idea/show1.png' width="800px"/>
 
 
 
