@@ -71,56 +71,30 @@ Shape extractor defination of structure of Unet
 
 Our trained model with unpaired whole-body MR and CT images
 
-- our best performance model with our method，`self`
+- our best performance model with our method，`Self+Lcc_finetune`
 - trained model with only correlation coefficient loss，`cycle_Lcc`
-- test data A with label，`all_test_feat_A_withlabel.csv`
-- test data B without label，`all_test_feat_B.csv`
-- augmented train data，`arg_top_.csv`
-- train data - offline test，`offline_train_feat.csv`
-- offline data to imitate A/B test，`offline_test_feat.csv`
 
-### regression
+### output
 
-Elastic linear regression
-
-- Elastic linear regression，`elasticnet_regression.py`
-- normalize function，`normalize.py`
-
-#### output
-
-- output of regression，`pre_results.csv`
-- saved regression model，`linear_regression_modelNor.h5`
+output of test-adapt or test_pipeline
 
 
-### classification
+### fill_hole.py
 
-- `cla_rf.py`，training random forest classification (threhold of blood suger is top n% Median)
-- `cla_xgb_hp95.py`，training XGboost classification (threhold of blood suger is top 95% Median)
-- `cla_xgb_lp30.py`,training XGboost classification (threhold of blood suger is low 30% Median)
-- `cla_svm.py`,training SVM classification (threhold of blood suger is top n% Median)
-- `voting.py`,soft vote to get classification top-k result by combining different classifications
-- `hard_voting.py`,hard vote to get classification top-k result (not good)
-- `W.py`,training weight to combine different classification (hard to train)
-- `W_simple.py`,training weight to combine different classification
+Prepare training data for MR and CT mask 
 
-#### output
+### train.py
 
-output of single classification
+Train a new model with our explicit constraint adversarial learning
 
-##### deep_w
+### test-adapt.py
 
-output of single classification to train W_simple
+Make a image synthesis with our trained model on one patient
+(We have already made the data preprocess, and you can find the synthesised data in output)
 
-#### final_top_cla
+### test-pipeline.py
 
-##### offline
-final result of combining classification to get the highest bloos suger with label (offline)
-
-##### online
-final result of combining classification to get the highest bloos suger without label (online)
-
-
-
+Make image synthesis with our trained model on multiple data
 
 
 
@@ -142,94 +116,20 @@ cd pytorch-CycleGAN-and-pix2pix
 ```
 - For Conda users, we include a script `./scripts/conda_deps.sh` to install PyTorch and other libraries.
 
-### CycleGAN train/test
-- Download a CycleGAN dataset (e.g. maps):
-```bash
-bash ./datasets/download_cyclegan_dataset.sh maps
-```
-- Train a model:
-```bash
-#!./scripts/train_cyclegan.sh
-python train.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
-```
-- To view training results and loss plots, run `python -m visdom.server` and click the URL http://localhost:8097. To see more intermediate results, check out `./checkpoints/maps_cyclegan/web/index.html`
-- Test the model:
-```bash
-#!./scripts/test_cyclegan.sh
-python test.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
-```
-The test results will be saved to a html file here: `./results/maps_cyclegan/latest_test/index.html`.
+###  train a explicit constraint model on MR to CT mapping
 
-### pix2pix train/test
-- Download a pix2pix dataset (e.g.facades):
 ```bash
-bash ./datasets/download_pix2pix_dataset.sh facades
+python train.py
 ```
-- Train a model:
+The trained model will be saved to : `./checkpoints/{model_name}`.
+
+###  test our trained model
+
 ```bash
-#!./scripts/train_pix2pix.sh
-python train.py --dataroot ./datasets/facades --name facades_pix2pix --model pix2pix --which_direction BtoA
+python test-adapt.py
 ```
-- To view training results and loss plots, run `python -m visdom.server` and click the URL http://localhost:8097. To see more intermediate results, check out  `./checkpoints/facades_pix2pix/web/index.html`
-- Test the model (`bash ./scripts/test_pix2pix.sh`):
-```bash
-#!./scripts/test_pix2pix.sh
-python test.py --dataroot ./datasets/facades --name facades_pix2pix --model pix2pix --which_direction BtoA
-```
-The test results will be saved to a html file here: `./results/facades_pix2pix/test_latest/index.html`.
+The test results will be saved to : `./output/{model_name}`.
 
-More example scripts can be found at `scripts` directory.
-
-### Apply a pre-trained model (CycleGAN)
-- You can download a pretrained model (e.g. horse2zebra) with the following script:
-```bash
-bash ./scripts/download_cyclegan_model.sh horse2zebra
-```
-The pretrained model is saved at `./checkpoints/{name}_pretrained/latest_net_G.pth`. The available models are apple2orange, orange2apple, summer2winter_yosemite, winter2summer_yosemite, horse2zebra, zebra2horse, monet2photo, style_monet, style_cezanne, style_ukiyoe, style_vangogh, sat2map, map2sat, cityscapes_photo2label, cityscapes_label2photo, facades_photo2label, facades_label2photo, and iphone2dslr_flower.
-- To test the model, you also need to download the  horse2zebra dataset:
-```bash
-bash ./datasets/download_cyclegan_dataset.sh horse2zebra
-```
-
-- Then generate the results using
-```bash
-python test.py --dataroot datasets/horse2zebra/testA --name horse2zebra_pretrained --model test
-```
-The option `--model test` is used for generating results of CycleGAN only for one side. `python test.py --model cycle_gan` will require loading and generating results in both directions, which is sometimes unnecessary. The results will be saved at `./results/`. Use `--results_dir {directory_path_to_save_result}` to specify the results directory.
-
-- If you would like to apply a pre-trained model to a collection of input images (rather than image pairs), please use `--dataset_mode single` and `--model test` options. Here is a script to apply a model to Facade label maps (stored in the directory `facades/testB`).
-``` bash
-#!./scripts/test_single.sh
-python test.py --dataroot ./datasets/facades/testB/ --name {your_trained_model_name} --model test
-```
-You might want to specify `--which_model_netG` to match the generator architecture of the trained model.
-
-### Apply a pre-trained model (pix2pix)
-
-Download a pre-trained model with `./scripts/download_pix2pix_model.sh`.
-
-- For example, if you would like to download label2photo model on the Facades dataset,
-```bash
-bash ./scripts/download_pix2pix_model.sh facades_label2photo
-```
-
-- Download the pix2pix facades datasets
-```bash
-bash ./datasets/download_pix2pix_dataset.sh facades
-```
-- Then generate the results using
-```bash
-python test.py --dataroot ./datasets/facades/ --which_direction BtoA --model pix2pix --name facades_label2photo_pretrained
-```
-Note that we specified `--which_direction BtoA` as Facades dataset's A to B direction is photos to labels.
-
-- See a list of currently available models at `./scripts/download_pix2pix_model.sh`
-
-## [Datasets](docs/datasets.md)
-Download pix2pix/CycleGAN datasets and create your own datasets.
-
-## [Training/Test Tips](docs/tips.md)
-Best practice for training and testing your models.
 
 ## cite
 
