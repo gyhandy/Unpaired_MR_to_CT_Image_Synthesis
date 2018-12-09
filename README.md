@@ -20,14 +20,14 @@ mapping
 
 #### original_data
 <img src='imgs/show1.png' width="800px">
+
 #### pipeline
 <img src='imgs/show2.png' width="800px">
-
 <img src='imgs/show5.png' width="800px">
+
 #### performance
 
 <img src='imgs/show3.png' width="800px">
-
 <img src='imgs/show4.png' width="800px">
 
 ## Code description
