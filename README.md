@@ -32,14 +32,14 @@ mapping
 
 ## Code description
 
-### data_processing
+### data
 
-Before classification and regression, process the raw data 
+Medical raw data preprocess and dataset class
 
-- only augment top train data，`data_augment_top.py`
-- augment train data，`data_augment_all.py`
-- onehot coding，`onehot.py`
-- make offline dataset，`offline_data_extract.py`
+- Turn the 3D slice Medical image to 2D slice and satisfy the data structure of algorithm，`dataset_pre_new.py`
+- Dataset containing (MR, CT, MR_mask) when training，`unaligned_dataset.py`
+- Sigle dataset containing MR only when testing/mapping，`single_dataset.py`
+- Basic dataset class of Cycle-GAN，`base_dataset.py`
 
 #### original_data
 
