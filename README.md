@@ -8,6 +8,7 @@ The code was written by [Yunhao Ge](https://github.com/gyhandy) based on the str
 
 **Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/raw/master/Unpaired%20whole-body%20MR%20to%20CT%20synthesis%20with%20correlation%20coefficient%20constrained%20adversarial%20learning-SPIE.pdf) 
 
+## Abstract
 
 MR to CT image synthesis plays an important role in medical image analysis, and its applications included, but not limited to PET-MR attenuation correction and MR only radiation therapy planning.Recently, deep learning-based image synthesis techniques have achieved much success. However, most of the current methods require large scales of paired data from two different modalities, which greatly limits their usage as in some situation paired data is infeasible to obtain. Some efforts have been proposed to relax this constraint such as cycle-consistent adversarial networks (Cycle-GAN). However, the cycle consistency loss is an indirect structural similarity constraint of input and synthesized images, and it sometimes lead to inferior synthesized results.  
 Contribution  
@@ -17,50 +18,97 @@ Contribution
 to improve the synthesis quality. Gained substantial quality improvement especially in the surface shape and bone in whole body image
 mapping  
 
-<img src='idea/show1.png' width="800px">
+#### original_data
+<img src='imgs/show1.png' width="800px">
+#### pipeline
+<img src='imgs/show2.png' width="800px">
+
+<img src='imgs/show5.png' width="800px">
+#### performance
+
+<img src='imgs/show3.png' width="800px">
+
+<img src='imgs/show4.png' width="800px">
+
+## Code description
+
+### data_processing
+
+Before classification and regression, process the raw data 
+
+- only augment top train data，`data_augment_top.py`
+- augment train data，`data_augment_all.py`
+- onehot coding，`onehot.py`
+- make offline dataset，`offline_data_extract.py`
+
+#### original_data
+
+- upload sample，`d_sample_20180102.csv`
+- testdata_A，`d_test_A_20180102`
+- testdata_B，`d_test_B_20180128.csv`
+
+#### aug_data
+
+- augmented data，`d_top_augment_5times_2.csv`
+- augmented data，`d_top_20180201_130642.csv`
+- augmented data，`d_top.csv`
+
+#### final_onehot
+
+After one hot coding waiting for being used
+
+- train data，`all_train_feat.csv`
+- test data A without label，`all_test_feat_A.csv`
+- test data A with label，`all_test_feat_A_withlabel.csv`
+- test data B without label，`all_test_feat_B.csv`
+- augmented train data，`arg_top_.csv`
+- train data - offline test，`offline_train_feat.csv`
+- offline data to imitate A/B test，`offline_test_feat.csv`
+
+### regression
+
+Elastic linear regression
+
+- Elastic linear regression，`elasticnet_regression.py`
+- normalize function，`normalize.py`
+
+#### output
+
+- output of regression，`pre_results.csv`
+- saved regression model，`linear_regression_modelNor.h5`
+
+
+### classification
+
+- `cla_rf.py`，training random forest classification (threhold of blood suger is top n% Median)
+- `cla_xgb_hp95.py`，training XGboost classification (threhold of blood suger is top 95% Median)
+- `cla_xgb_lp30.py`,training XGboost classification (threhold of blood suger is low 30% Median)
+- `cla_svm.py`,training SVM classification (threhold of blood suger is top n% Median)
+- `voting.py`,soft vote to get classification top-k result by combining different classifications
+- `hard_voting.py`,hard vote to get classification top-k result (not good)
+- `W.py`,training weight to combine different classification (hard to train)
+- `W_simple.py`,training weight to combine different classification
+
+#### output
+
+output of single classification
+
+##### deep_w
+
+output of single classification to train W_simple
+
+#### final_top_cla
+
+##### offline
+final result of combining classification to get the highest bloos suger with label (offline)
+
+##### online
+final result of combining classification to get the highest bloos suger without label (online)
 
 
 
-cite:
-
-Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks
-[Jun-Yan Zhu](https://people.eecs.berkeley.edu/~junyanz/)\*,  [Taesung Park](https://taesung.me/)\*, [Phillip Isola](https://people.eecs.berkeley.edu/~isola/), [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros)
-In ICCV 2017. (* equal contributions) [[Bibtex]](https://junyanz.github.io/CycleGAN/CycleGAN.txt)
 
 
-## Course
-CycleGAN course assignment [code](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/assignments/a4-code.zip) and [handout](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/assignments/a4-handout.pdf) designed by Prof. [Roger Grosse](http://www.cs.toronto.edu/~rgrosse/) for [CSC321](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/) "Intro to Neural Networks and Machine Learning" at University of Toronto. Please contact the instructor if you would like to adopt it in your course.
-
-## Other implementations
-### CycleGAN
-<p><a href="https://github.com/leehomyc/cyclegan-1"> [Tensorflow]</a> (by Harry Yang),
-<a href="https://github.com/architrathore/CycleGAN/">[Tensorflow]</a> (by Archit Rathore),
-<a href="https://github.com/vanhuyz/CycleGAN-TensorFlow">[Tensorflow]</a> (by Van Huy),
-<a href="https://github.com/XHUJOY/CycleGAN-tensorflow">[Tensorflow]</a> (by Xiaowei Hu),
-<a href="https://github.com/LynnHo/CycleGAN-Tensorflow-Simple"> [Tensorflow-simple]</a> (by Zhenliang He),
-<a href="https://github.com/luoxier/CycleGAN_Tensorlayer"> [TensorLayer]</a> (by luoxier),
-<a href="https://github.com/Aixile/chainer-cyclegan">[Chainer]</a> (by Yanghua Jin),
-<a href="https://github.com/yunjey/mnist-svhn-transfer">[Minimal PyTorch]</a> (by yunjey),
-<a href="https://github.com/Ldpe2G/DeepLearningForFun/tree/master/Mxnet-Scala/CycleGAN">[Mxnet]</a> (by Ldpe2G),
-<a href="https://github.com/tjwei/GANotebooks">[lasagne/keras]</a> (by tjwei)</p>
-</ul>
-
-### pix2pix
-<p><a href="https://github.com/affinelayer/pix2pix-tensorflow"> [Tensorflow]</a> (by Christopher Hesse),
-<a href="https://github.com/Eyyub/tensorflow-pix2pix">[Tensorflow]</a> (by Eyyüb Sariu),
-<a href="https://github.com/datitran/face2face-demo"> [Tensorflow (face2face)]</a> (by Dat Tran),
-<a href="https://github.com/awjuliani/Pix2Pix-Film"> [Tensorflow (film)]</a> (by Arthur Juliani),
-<a href="https://github.com/kaonashi-tyc/zi2zi">[Tensorflow (zi2zi)]</a> (by Yuchen Tian),
-<a href="https://github.com/pfnet-research/chainer-pix2pix">[Chainer]</a> (by mattya),
-<a href="https://github.com/tjwei/GANotebooks">[tf/torch/keras/lasagne]</a> (by tjwei),
-<a href="https://github.com/taey16/pix2pixBEGAN.pytorch">[Pytorch]</a> (by taey16)
-</p>
-</ul>
-
-## Prerequisites
-- Linux or macOS
-- Python 2 or 3
-- CPU or NVIDIA GPU + CUDA CuDNN
 
 ## Getting Started
 ### Installation
@@ -169,36 +217,10 @@ Download pix2pix/CycleGAN datasets and create your own datasets.
 ## [Training/Test Tips](docs/tips.md)
 Best practice for training and testing your models.
 
-## Citation
-If you use this code for your research, please cite our papers.
-```
-@inproceedings{CycleGAN2017,
-  title={Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networkss},
-  author={Zhu, Jun-Yan and Park, Taesung and Isola, Phillip and Efros, Alexei A},
-  booktitle={Computer Vision (ICCV), 2017 IEEE International Conference on},
-  year={2017}
-}
+## cite
+
+Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks
+[Jun-Yan Zhu](https://people.eecs.berkeley.edu/~junyanz/)\*,  [Taesung Park](https://taesung.me/)\*, [Phillip Isola](https://people.eecs.berkeley.edu/~isola/), [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros)
+In ICCV 2017. (* equal contributions) [[Bibtex]](https://junyanz.github.io/CycleGAN/CycleGAN.txt)
 
 
-@inproceedings{isola2017image,
-  title={Image-to-Image Translation with Conditional Adversarial Networks},
-  author={Isola, Phillip and Zhu, Jun-Yan and Zhou, Tinghui and Efros, Alexei A},
-  booktitle={Computer Vision and Pattern Recognition (CVPR), 2017 IEEE Conference on},
-  year={2017}
-}
-```
-
-
-
-## Related Projects
-**[CycleGAN-Torch](https://github.com/junyanz/CycleGAN) |
-[pix2pix-Torch](https://github.com/phillipi/pix2pix) | [pix2pixHD](https://github.com/NVIDIA/pix2pixHD) |
-[iGAN](https://github.com/junyanz/iGAN) |
-[BicycleGAN](https://github.com/junyanz/BicycleGAN)**
-
-## Cat Paper Collection
-If you love cats, and love reading cool graphics, vision, and learning papers, please check out the Cat Paper Collection:
-[Github](https://github.com/junyanz/CatPapers) |  [Webpage](https://people.eecs.berkeley.edu/~junyanz/cat/cat_papers.html)
-
-## Acknowledgments
-Code is inspired by [pytorch-DCGAN](https://github.com/pytorch/examples/tree/master/dcgan).
