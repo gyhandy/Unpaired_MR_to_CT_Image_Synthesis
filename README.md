@@ -1,40 +1,32 @@
-<img src='imgs/horse2zebra.gif' align="right" width=384>
-
-<br><br><br>
-
-# CycleGAN and pix2pix in PyTorch
-
-This is our PyTorch implementation for both unpaired and paired image-to-image translation. It is still under active development.
-
-The code was written by [Jun-Yan Zhu](https://github.com/junyanz) and [Taesung Park](https://github.com/taesung89), and supported by [Tongzhou Wang](https://ssnl.github.io/).
-
-This PyTorch implementation produces results comparable to or better than our original Torch software. If you would like to reproduce the exact same results as in the papers, check out the original [CycleGAN Torch](https://github.com/junyanz/CycleGAN) and [pix2pix Torch](https://github.com/phillipi/pix2pix) code
-
-**Note**: The current software works well with PyTorch 0.4. Check out the older [branch](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/tree/pytorch0.3.1) that supports PyTorch 0.1-0.3.
-
-**CycleGAN: [Project](https://junyanz.github.io/CycleGAN/) |  [Paper](https://arxiv.org/pdf/1703.10593.pdf) |  [Torch](https://github.com/junyanz/CycleGAN)**
-<img src="https://junyanz.github.io/CycleGAN/images/teaser_high_res.jpg" width="800"/>
 
 
-**Pix2pix:  [Project](https://phillipi.github.io/pix2pix/) |  [Paper](https://arxiv.org/pdf/1611.07004v1.pdf) |  [Torch](https://github.com/phillipi/pix2pix)**
+# Unpaired-Cross-modality-Image-Synthesis
 
-<img src="https://phillipi.github.io/pix2pix/images/teaser_v3.png" width="800px"/>
+This is our PyTorch implementation for Unpaired whole-body MR to CT Image Synthesis. It is still under active development.
+
+The code was written by [Yunhao Ge](https://github.com/gyhandy) based on the structure of Cycle-GAN ([Jun-Yan Zhu](https://github.com/junyanz)).
+
+**Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/raw/master/Unpaired%20whole-body%20MR%20to%20CT%20synthesis%20with%20correlation%20coefficient%20constrained%20adversarial%20learning-SPIE.pdf) 
 
 
-**[EdgesCats Demo](https://affinelayer.com/pixsrv/) | [pix2pix-tensorflow](https://github.com/affinelayer/pix2pix-tensorflow) | by [Christopher Hesse](https://twitter.com/christophrhesse)**
+MR to CT image synthesis plays an important role in medical image analysis, and its applications included, but not limited to PET-MR attenuation correction and MR only radiation therapy planning.Recently, deep learning-based image synthesis techniques have achieved much success. However, most of the current methods require large scales of paired data from two different modalities, which greatly limits their usage as in some situation paired data is infeasible to obtain. Some efforts have been proposed to relax this constraint such as cycle-consistent adversarial networks (Cycle-GAN). However, the cycle consistency loss is an indirect structural similarity constraint of input and synthesized images, and it sometimes lead to inferior synthesized results. 
+Contribution
+1 Proposed an explicit structural constrained adversarial learning method to improve both the realistic and precise of the synthesized images which were unique to cross-modality medical image mapping
+2 Designed a novel correlation coefficient loss, which directly constrained the structural similarity between the input Magnetic Resonance (MR) and synthesized Computed Tomography (CT) image, to solve the mismatch of anatomical structures in synthesized CT images
+3 Developed a shape discriminator to incorporate the shape consistency information by extracting shape masks from two modality images
+to improve the synthesis quality. Gained substantial quality improvement especially in the surface shape and bone in whole body image
+mapping
 
-<img src='imgs/edges2cats.jpg' width="400px"/>
+<img src="img src='ideas/show1.png'" width="800px"/>
 
-If you use this code for your research, please cite:
+
+
+cite:
 
 Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks
 [Jun-Yan Zhu](https://people.eecs.berkeley.edu/~junyanz/)\*,  [Taesung Park](https://taesung.me/)\*, [Phillip Isola](https://people.eecs.berkeley.edu/~isola/), [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros)
 In ICCV 2017. (* equal contributions) [[Bibtex]](https://junyanz.github.io/CycleGAN/CycleGAN.txt)
 
-
-Image-to-Image Translation with Conditional Adversarial Networks
-[Phillip Isola](https://people.eecs.berkeley.edu/~isola), [Jun-Yan Zhu](https://people.eecs.berkeley.edu/~junyanz), [Tinghui Zhou](https://people.eecs.berkeley.edu/~tinghuiz), [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros)
-In CVPR 2017. [[Bibtex]](http://people.csail.mit.edu/junyanz/projects/pix2pix/pix2pix.bib)
 
 ## Course
 CycleGAN course assignment [code](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/assignments/a4-code.zip) and [handout](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/assignments/a4-handout.pdf) designed by Prof. [Roger Grosse](http://www.cs.toronto.edu/~rgrosse/) for [CSC321](http://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/) "Intro to Neural Networks and Machine Learning" at University of Toronto. Please contact the instructor if you would like to adopt it in your course.
