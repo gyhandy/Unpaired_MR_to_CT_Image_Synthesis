@@ -41,17 +41,18 @@ Medical raw data preprocess and dataset class
 - Sigle dataset containing MR only when testing/mapping，`single_dataset.py`
 - Basic dataset class of Cycle-GAN，`base_dataset.py`
 
-#### original_data
+### models
 
-- upload sample，`d_sample_20180102.csv`
-- testdata_A，`d_test_A_20180102`
-- testdata_B，`d_test_B_20180128.csv`
+Models define and structures
 
-#### aug_data
+- Basic model structure，`base_model.py`
+- Explicit constraint adversarial learning model based on Cycle-GAN，`cycle_gan_model.py`
+- Mapping model when testing，`test_model.py`
+- Basic class and networks，`networks.py`
 
-- augmented data，`d_top_augment_5times_2.csv`
-- augmented data，`d_top_20180201_130642.csv`
-- augmented data，`d_top.csv`
+### options
+
+Parameter settings when training and testing
 
 #### final_onehot
 
