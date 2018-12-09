@@ -54,12 +54,25 @@ Models define and structures
 
 Parameter settings when training and testing
 
-#### final_onehot
+### datasets
 
-After one hot coding waiting for being used
+- test original data from one patient with 4 modality MR images and unpaired CT images，`ZS18158187`
+- training dataset with trainA(MR), trainB(CT), maskA(MR_mask), testA(MR) and testB（CT)`MR2CT`
 
-- train data，`all_train_feat.csv`
-- test data A without label，`all_test_feat_A.csv`
+### CT_segmentation
+
+Training a shape extractor for our explicit constraint adversarial learning
+
+### Unet
+
+Shape extractor defination of structure of Unet
+
+### checkpoints
+
+Our trained model with unpaired whole-body MR and CT images
+
+- our best performance model with our method，`self`
+- trained model with only correlation coefficient loss，`cycle_Lcc`
 - test data A with label，`all_test_feat_A_withlabel.csv`
 - test data B without label，`all_test_feat_B.csv`
 - augmented train data，`arg_top_.csv`
