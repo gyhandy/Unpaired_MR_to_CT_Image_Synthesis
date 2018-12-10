@@ -24,6 +24,7 @@ mapping
 #### pipeline
 
 <img src='imgs/show5.png' width="800px">
+<img src='imgs/Show21.png' width="800px">
 
 #### performance
 
