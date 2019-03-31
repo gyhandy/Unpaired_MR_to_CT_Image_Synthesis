@@ -128,8 +128,7 @@ cd pytorch-CycleGAN-and-pix2pix
 
 ###  train a explicit constraint model on MR to CT mapping
 
-For the dataset in training and testing, please create a new document 'datasets' and download the datasets in it.(link：https://pan.baidu.com/s/17Q8XERh3Qo5aPXGgpGhZfA 
-code：57rm ; If the expiry date is exceeded, please email gyhandy@sjtu.edu.cn )
+For the dataset in training and testing, please create a new document 'datasets' and prepare the data by yourself.
 
 ```bash
 python train.py
