@@ -8,6 +8,15 @@ The code was written by [Yunhao Ge](https://github.com/gyhandy) based on the str
 
 **Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/raw/master/Unpaired%20whole-body%20MR%20to%20CT%20synthesis%20with%20correlation%20coefficient%20constrained%20adversarial%20learning-SPIE.pdf) 
 
+## Citation
+If you use this code for your research, please cite:
+
+Unpaired MR to CT Synthesis with Explicit Structural Constrained Adversarial Learning.
+Yunhao Ge∗,Dongming Wei∗,Zhong Xue, Qian Wang, Xiang Zhou, Yiqiang Zhan, Shu Liao. In IEEE International Symposium on Biomedical Imaging (ISBI), 2019. (* equal contributions)
+
+Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning.
+Yunhao Ge, Zhong Xue, Tuoyu Cao, Shu Liao. In SPIE-Medical Imaging, 2019.
+
 ## Abstract
 
 MR to CT image synthesis plays an important role in medical image analysis, and its applications included, but not limited to PET-MR attenuation correction and MR only radiation therapy planning.Recently, deep learning-based image synthesis techniques have achieved much success. However, most of the current methods require large scales of paired data from two different modalities, which greatly limits their usage as in some situation paired data is infeasible to obtain. Some efforts have been proposed to relax this constraint such as cycle-consistent adversarial networks (Cycle-GAN). However, the cycle consistency loss is an indirect structural similarity constraint of input and synthesized images, and it sometimes lead to inferior synthesized results.  
