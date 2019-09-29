@@ -4,7 +4,9 @@
 
 This is our PyTorch implementation for Unpaired whole-body MR to CT Image Synthesis. It is still under active development.
 
-The code was written by [Yunhao Ge](https://github.com/gyhandy) based on the structure of Cycle-GAN ([Jun-Yan Zhu](https://github.com/junyanz)).
+The code was written by [Yunhao Ge](https://github.com/gyhandy) [Website](gyhandy.github.io) based on the structure of Cycle-GAN ([Jun-Yan Zhu](https://github.com/junyanz)).
+
+**Unpaired MR to CT Synthesis with Explicit Structural Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/blob/master/UNPAIRED%20MR%20TO%20CT%20SYNTHESIS%20WITH%20EXPLICIT%20STRUCTURAL%20CONSTRAINED%20ADVERSARIAL%20LEARNING.pdf) 
 
 **Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/raw/master/Unpaired%20whole-body%20MR%20to%20CT%20synthesis%20with%20correlation%20coefficient%20constrained%20adversarial%20learning-SPIE.pdf) 
 
