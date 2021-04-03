@@ -10,15 +10,6 @@ The code was written by [Yunhao Ge](https://github.com/gyhandy) [Website](gyhand
 
 **Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning: [PDF](https://github.com/gyhandy/publication/raw/master/Unpaired%20whole-body%20MR%20to%20CT%20synthesis%20with%20correlation%20coefficient%20constrained%20adversarial%20learning-SPIE.pdf) 
 
-## Citation
-If you use this code for your research, please cite:
-
-Unpaired MR to CT Synthesis with Explicit Structural Constrained Adversarial Learning.
-Yunhao Ge∗,Dongming Wei∗,Zhong Xue, Qian Wang, Xiang Zhou, Yiqiang Zhan, Shu Liao. In IEEE International Symposium on Biomedical Imaging (ISBI), 2019. (* equal contributions)
-
-Unpaired Whole-body MR to CT Synthesis with Correlation Coefficient Constrained Adversarial Learning.
-Yunhao Ge, Zhong Xue, Tuoyu Cao, Shu Liao. In SPIE-Medical Imaging, 2019.
-
 ## Abstract
 
 MR to CT image synthesis plays an important role in medical image analysis, and its applications included, but not limited to PET-MR attenuation correction and MR only radiation therapy planning.Recently, deep learning-based image synthesis techniques have achieved much success. However, most of the current methods require large scales of paired data from two different modalities, which greatly limits their usage as in some situation paired data is infeasible to obtain. Some efforts have been proposed to relax this constraint such as cycle-consistent adversarial networks (Cycle-GAN). However, the cycle consistency loss is an indirect structural similarity constraint of input and synthesized images, and it sometimes lead to inferior synthesized results.  
@@ -144,11 +135,33 @@ python test-adapt.py
 ```
 The test results will be saved to : `./output/{model_name}`.
 
+## Citation
+If you use this code for your research, please cite our papers.
+```
+@inproceedings{ge2019unpaired,
+  title={Unpaired whole-body MR to CT synthesis with correlation coefficient constrained adversarial learning},
+  author={Ge, Yunhao and Xue, Zhong and Cao, Tuoyu and Liao, Shu},
+  booktitle={Medical Imaging 2019: Image Processing},
+  volume={10949},
+  pages={1094905},
+  year={2019},
+  organization={International Society for Optics and Photonics}
+}
 
-## cite
 
-Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks
-[Jun-Yan Zhu](https://people.eecs.berkeley.edu/~junyanz/)\*,  [Taesung Park](https://taesung.me/)\*, [Phillip Isola](https://people.eecs.berkeley.edu/~isola/), [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros)
-In ICCV 2017. (* equal contributions) [[Bibtex]](https://junyanz.github.io/CycleGAN/CycleGAN.txt)
+@inproceedings{ge2019unpaired,
+  title={Unpaired Mr to CT Synthesis with Explicit Structural Constrained Adversarial Learning},
+  author={Ge, Yunhao and Wei, Dongming and Xue, Zhong and Wang, Qian and Zhou, Xiang and Zhan, Yiqiang and Liao, Shu},
+  booktitle={2019 IEEE 16th International Symposium on Biomedical Imaging (ISBI 2019)},
+  pages={1096--1099},
+  year={2019},
+  organization={IEEE}
+}
+```
+
+
+
+## Acknowledgments
+Our code is inspired by [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix).
 
 
